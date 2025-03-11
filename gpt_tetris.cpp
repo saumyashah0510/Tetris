@@ -319,11 +319,39 @@ public:
                 clearLines();
                 break;
             case 27:
-                exit(0);
+                pauseGame();
+                break;
             }
         }
 
         Sleep(speed);
+    }
+
+    void pauseGame()
+    {
+        clearScreen();
+        std::cout << "==========================" << std::endl;
+        std::cout << "        GAME PAUSED        " << std::endl;
+        std::cout << "==========================" << std::endl;
+        std::cout << "[1] Resume Game" << std::endl;
+        std::cout << "[2] Exit Game" << std::endl;
+        std::cout << "==========================" << std::endl;
+
+        char choice;
+        while (true)
+        {
+            choice = _getch();
+            if (choice == '1')
+            {
+                clearScreen();
+                draw();
+                break;
+            }
+            else if (choice == '2')
+            {
+                exit(0);
+            }
+        }
     }
 
     void resetGame()
