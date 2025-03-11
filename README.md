@@ -59,3 +59,18 @@ A console-based Tetris game built in C++ with colorful blocks, scoring system, a
     ```bash
     ./tetris.exe
 
+<br>
+
+## 🏆 Scoring System
+- 100 Points for each completed line
+- Game speed increases as you score more points
+- Achieving a new high score will save automatically
+
+<br>
+
+## 🔊 Sound Support
+- The game includes sound effects during gameplay.
+- Ensure that sound.wav is in the same folder as the executable for proper functionality.
+
+## License:
+This project is open-source and can be modified as needed.
