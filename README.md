@@ -48,5 +48,14 @@ A console-based Tetris game built in C++ with colorful blocks, scoring system, a
 ### Steps to Compile and Run
 1. **Clone the Repository**
    ```bash
-   git clone <repository-link>
-   cd Tetris-CPP
+   git clone <https://github.com/saumyashah0510/Tetris.git>
+   cd tetris-CPP
+
+2. **Compile the Code Using g++ compiler:**
+    ```bash
+    g++ main.cpp -o tetris -lwinmm
+
+3. **Run the game**
+    ```bash
+    ./tetris.exe
+
