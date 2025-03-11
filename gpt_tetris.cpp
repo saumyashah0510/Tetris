@@ -262,7 +262,10 @@ public:
             std::cout << std::endl;
         }
 
-        std::cout << "Score: " << score << "   High Score: " << highScore << std::endl;
+        cursorPosition.X = 0;
+        cursorPosition.Y = HEIGHT;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+        std::cout << "Score: " << score << "   High Score: " << highScore << "  ";
     }
 
     void update()
