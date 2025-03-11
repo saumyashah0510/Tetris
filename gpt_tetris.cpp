@@ -8,6 +8,9 @@
 const int WIDTH = 10;
 const int HEIGHT = 20;
 
+void showWelcomeScreen();
+void clearScreen();
+
 class Tetromino
 {
 public:
@@ -149,23 +152,7 @@ private:
         }
     }
 
-    void clearScreen()
-    {
-        COORD topLeft = {0, 0};
-        HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-        CONSOLE_SCREEN_BUFFER_INFO screen;
-        DWORD written;
-
-        // Get the number of character cells in the current buffer
-        GetConsoleScreenBufferInfo(console, &screen);
-        DWORD cells = screen.dwSize.X * screen.dwSize.Y;
-
-        // Fill the entire screen with spaces
-        FillConsoleOutputCharacter(console, ' ', cells, topLeft, &written);
-
-        // Reset the cursor to the top left
-        SetConsoleCursorPosition(console, topLeft);
-    }
+   
 
 public:
     Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), currentPiece(nullptr), score(0), speed(300)
@@ -293,37 +280,47 @@ public:
         if (_kbhit())
         {
             char key = _getch();
-            switch (key)
+            if (key == 0 || key == -32) // Handle special keys (arrow keys)
             {
-            case 'a':
-                if (isValidMove(currentPiece, currentPiece->x - 1, currentPiece->y))
-                    currentPiece->x--;
-                break;
-            case 'd':
-                if (isValidMove(currentPiece, currentPiece->x + 1, currentPiece->y))
-                    currentPiece->x++;
-                break;
-            case 'w':
-            {
-                Tetromino temp = *currentPiece;
-                temp.rotate();
-                if (isValidMove(&temp, temp.x, temp.y))
-                    currentPiece->rotate();
-                break;
+                key = _getch(); // Get the actual key value
+                switch (key)
+                {
+                case 75: // Left arrow key
+                    if (isValidMove(currentPiece, currentPiece->x - 1, currentPiece->y))
+                        currentPiece->x--;
+                    break;
+                case 77: // Right arrow key
+                    if (isValidMove(currentPiece, currentPiece->x + 1, currentPiece->y))
+                        currentPiece->x++;
+                    break;
+                case 72: // Up arrow key (Rotate)
+                {
+                    Tetromino temp = *currentPiece;
+                    temp.rotate();
+                    if (isValidMove(&temp, temp.x, temp.y))
+                        currentPiece->rotate();
+                    break;
+                }
+                case 80: // Down arrow key (Soft drop)
+                    if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
+                        currentPiece->y++;
+                    break;
+                }
             }
-            case 's':
-                if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
-                    currentPiece->y++;
-                break;
-            case 32:
-                while (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
-                    currentPiece->y++;
-                placePiece();
-                clearLines();
-                break;
-            case 27:
-                pauseGame();
-                break;
+            else
+            {
+                switch (key)
+                {
+                case 32: // Spacebar (Hard drop)
+                    while (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
+                        currentPiece->y++;
+                    placePiece();
+                    clearLines();
+                    break;
+                case 27: // ESC key (Pause)
+                    pauseGame();
+                    break;
+                }
             }
         }
 
@@ -412,6 +409,7 @@ public:
 
 int main()
 {
+    showWelcomeScreen();
     Game game;
     while (true)
     {
@@ -420,3 +418,49 @@ int main()
     }
     return 0;
 }
+
+void clearScreen()
+{
+    COORD topLeft = {0, 0};
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO screen;
+    DWORD written;
+
+    // Get the number of character cells in the current buffer
+    GetConsoleScreenBufferInfo(console, &screen);
+    DWORD cells = screen.dwSize.X * screen.dwSize.Y;
+
+    // Fill the entire screen with spaces
+    FillConsoleOutputCharacter(console, ' ', cells, topLeft, &written);
+
+    // Reset the cursor to the top left
+    SetConsoleCursorPosition(console, topLeft);
+}
+
+void showWelcomeScreen()
+    {
+        clearScreen();
+        std::cout << "=====================================\n";
+        std::cout << "         WELCOME TO TETRIS\n";
+        std::cout << "=====================================\n";
+        std::cout << "\n";
+        std::cout << "CONTROLS:\n";
+        std::cout << "  - Left Arrow     : Move Left\n";
+        std::cout << "  - Right Arrow    : Move Right\n";
+        std::cout << "  - Up Arrow       : Rotate Piece\n";
+        std::cout << "  - Down Arrow     : Soft Drop (Faster fall)\n";
+        std::cout << "  - Spacebar       : Hard Drop (Instant fall)\n";
+        std::cout << "  - ESC            : Pause Game\n";
+        std::cout << "\n";
+        std::cout << "HOW TO PLAY:\n";
+        std::cout << "  - Stack blocks to form complete lines.\n";
+        std::cout << "  - Completed lines will clear and give you points.\n";
+        std::cout << "  - The game ends when blocks reach the top.\n";
+        std::cout << "\n";
+        std::cout << "=====================================\n";
+        std::cout << "  PRESS ANY KEY TO START THE GAME\n";
+        std::cout << "=====================================\n";
+
+        _getch(); // Wait for any key press
+        clearScreen();
+    }
