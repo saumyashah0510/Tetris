@@ -2,9 +2,13 @@
 #include <vector>
 #include <conio.h>
 #include <windows.h>
-#include <ctime>
-#include <fstream> // Add this for file handling
+#include <ctime>   // For generating random pieces
+#include <fstream> //For file handling
 
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
+
+// Size of the grid
 const int WIDTH = 10;
 const int HEIGHT = 20;
 
@@ -16,11 +20,13 @@ class Tetromino
 public:
     std::vector<std::vector<int>> shape;
     int x, y;
-    int color; // ✅ Fixed color for this piece
+    int color; // Fixed color for this piece
 
+    // constructor
     Tetromino(std::vector<std::vector<int>> s, int startX, int startY, int c)
         : shape(s), x(startX), y(startY), color(c) {}
 
+    // rotates pieces 90 degrees clockwise
     void rotate()
     {
         std::vector<std::vector<int>> rotated(shape[0].size(), std::vector<int>(shape.size()));
@@ -47,14 +53,17 @@ private:
     void loadHighScore()
     {
         std::ifstream file("highscore.txt");
-        if (file.is_open())
+        if (!file.is_open())
         {
-            file >> highScore;
-            file.close();
+            std::ofstream newFile("highscore.txt");
+            newFile << 0;
+            newFile.close();
+            highScore = 0;
         }
         else
         {
-            highScore = 0; // Default value if no file exists
+            file >> highScore;
+            file.close();
         }
     }
 
@@ -80,7 +89,7 @@ private:
             {{0, 0, 1}, {1, 1, 1}}  // L
         };
 
-        int color[] = {9, 14, 13, 2, 4, 6, 5}; // ✅ Fixed color for each piece
+        int color[] = {9, 14, 13, 2, 4, 6, 5}; // Fixed color for each piece
 
         int index = rand() % pieces.size();
         return new Tetromino(pieces[index], WIDTH / 2 - pieces[index][0].size() / 2, -2, color[index]);
@@ -118,7 +127,7 @@ private:
                     int xPos = currentPiece->x + j;
 
                     // ✅ Ignore any blocks that are placed above the screen
-                    if (yPos >= 0)
+                    if (yPos >= 0 && xPos >= 0 && xPos < grid[0].size())
                         grid[yPos][xPos] = currentPiece->color;
                 }
             }
@@ -145,16 +154,15 @@ private:
                 grid.erase(grid.begin() + i);
                 grid.insert(grid.begin(), std::vector<int>(WIDTH, 0));
                 score += 100;
-                speed -= 5;
+                speed -= 10;
                 if (speed < 50)
                     speed = 50;
             }
         }
     }
 
-   
-
 public:
+    // constructor initializing empty grid , piece, score and speed
     Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), currentPiece(nullptr), score(0), speed(300)
     {
         srand(static_cast<unsigned int>(time(0)));
@@ -162,6 +170,7 @@ public:
         clearScreen();
     }
 
+    // destructor
     ~Game()
     {
         if (currentPiece)
@@ -221,7 +230,7 @@ public:
 
                             if (currentPiece->shape[pi][pj] && x == j && y == i)
                             {
-                                // ✅ Apply the correct color based on piece type
+                                // Apply the correct color based on piece type
                                 setColor(currentPiece->color);
                                 std::cout << "O ";
                                 setColor(7); // Reset color to white
@@ -235,7 +244,7 @@ public:
                 {
                     if (grid[i][j])
                     {
-                        // ✅ Retain the color of placed blocks
+                        // Retain the color of placed blocks
                         setColor(grid[i][j]);
                         std::cout << "X ";
                         setColor(7);
@@ -272,6 +281,7 @@ public:
             clearLines();
             if (isGameOver())
             {
+                PlaySound(0, 0, 0);
                 showGameOver();
                 resetGame();
             }
@@ -330,6 +340,7 @@ public:
     void pauseGame()
     {
         clearScreen();
+        PlaySound(0, 0, 0);
         std::cout << "==========================" << std::endl;
         std::cout << "        GAME PAUSED        " << std::endl;
         std::cout << "==========================" << std::endl;
@@ -345,6 +356,7 @@ public:
             {
                 clearScreen();
                 draw();
+                PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC |SND_LOOP);
                 break;
             }
             else if (choice == '2')
@@ -370,7 +382,7 @@ public:
             highScore = score;
             saveHighScore(); // Save the new high score
         }
-        system("cls"); // ✅ Clear screen when Game Over
+        system("cls"); // Clear screen when Game Over
         std::cout << "==========================" << std::endl;
         std::cout << "        GAME OVER!        " << std::endl;
         std::cout << "     Final Score: " << score << std::endl;
@@ -399,7 +411,7 @@ public:
     {
         for (int i = 0; i < WIDTH; ++i)
         {
-            // ✅ Only consider game over if a BLOCK has SETTLED on row 0
+            // Only consider game over if a BLOCK has SETTLED on row 0
             if (grid[0][i] && currentPiece == nullptr)
                 return true;
         }
@@ -438,29 +450,30 @@ void clearScreen()
 }
 
 void showWelcomeScreen()
-    {
-        clearScreen();
-        std::cout << "=====================================\n";
-        std::cout << "         WELCOME TO TETRIS\n";
-        std::cout << "=====================================\n";
-        std::cout << "\n";
-        std::cout << "CONTROLS:\n";
-        std::cout << "  - Left Arrow     : Move Left\n";
-        std::cout << "  - Right Arrow    : Move Right\n";
-        std::cout << "  - Up Arrow       : Rotate Piece\n";
-        std::cout << "  - Down Arrow     : Soft Drop (Faster fall)\n";
-        std::cout << "  - Spacebar       : Hard Drop (Instant fall)\n";
-        std::cout << "  - ESC            : Pause Game\n";
-        std::cout << "\n";
-        std::cout << "HOW TO PLAY:\n";
-        std::cout << "  - Stack blocks to form complete lines.\n";
-        std::cout << "  - Completed lines will clear and give you points.\n";
-        std::cout << "  - The game ends when blocks reach the top.\n";
-        std::cout << "\n";
-        std::cout << "=====================================\n";
-        std::cout << "  PRESS ANY KEY TO START THE GAME\n";
-        std::cout << "=====================================\n";
+{
+    clearScreen();
+    std::cout << "=====================================\n";
+    std::cout << "         WELCOME TO TETRIS\n";
+    std::cout << "=====================================\n";
+    std::cout << "\n";
+    std::cout << "CONTROLS:\n";
+    std::cout << "  - Left Arrow     : Move Left\n";
+    std::cout << "  - Right Arrow    : Move Right\n";
+    std::cout << "  - Up Arrow       : Rotate Piece\n";
+    std::cout << "  - Down Arrow     : Soft Drop (Faster fall)\n";
+    std::cout << "  - Spacebar       : Hard Drop (Instant fall)\n";
+    std::cout << "  - ESC            : Pause Game\n";
+    std::cout << "\n";
+    std::cout << "HOW TO PLAY:\n";
+    std::cout << "  - Stack blocks to form complete lines.\n";
+    std::cout << "  - Completed lines will clear and give you points.\n";
+    std::cout << "  - The game ends when blocks reach the top.\n";
+    std::cout << "\n";
+    std::cout << "=====================================\n";
+    std::cout << "  PRESS ANY KEY TO START THE GAME\n";
+    std::cout << "=====================================\n";
 
-        _getch(); // Wait for any key press
-        clearScreen();
-    }
+    _getch(); // Wait for any key press
+    clearScreen();
+    PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC |SND_LOOP);
+}
