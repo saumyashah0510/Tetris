@@ -30,3 +30,23 @@ A console-based Tetris game built in C++ with colorful blocks, scoring system, a
 | **Down Arrow**    | Soft drop (faster fall)  |
 | **Spacebar**      | Hard drop (instant fall) |
 | **ESC**           | Pause the game           |
+
+<br>
+
+## 📋 How to Play
+1. **Stack blocks** to form complete horizontal lines.
+2. **Completed lines** will be cleared, and points will be awarded.
+3. The game ends when the **blocks reach the top** of the grid.
+
+<br>
+
+## 🖥️ Installation and Running the Game
+### Prerequisites
+- **Windows OS** (due to Windows-specific console features)
+- **C++ Compiler** (e.g., MinGW, Visual Studio, etc.)
+
+### Steps to Compile and Run
+1. **Clone the Repository**
+   ```bash
+   git clone <repository-link>
+   cd Tetris-CPP
