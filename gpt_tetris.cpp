@@ -84,7 +84,7 @@ private:
 
                     // ✅ Ignore any blocks that are placed above the screen
                     if (yPos >= 0)
-                        grid[yPos][xPos] = 1;
+                        grid[yPos][xPos] = getPieceColor(currentPiece->shape);
                 }
             }
         }
@@ -140,6 +140,31 @@ public:
         return speed;
     }
 
+    void setColor(int color)
+    {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
+
+    int getPieceColor(const std::vector<std::vector<int>> &shape)
+    {
+        if (shape.size() == 1 || shape[0].size() == 4)
+            return 9; // 🔵 Blue - I Piece
+        if (shape.size() == 2 && shape[0].size() == 2)
+            return 14; // 🟡 Yellow - O Piece
+        if (shape.size() == 2 && shape[0].size() == 3 && shape[1][0] == 1 && shape[1][2] == 1)
+            return 13; // 🟣 Purple - T Piece
+        if (shape.size() == 2 && shape[0][1] == 1 && shape[1][2] == 1)
+            return 4; // 🔴 Red - Z Piece
+        if (shape.size() == 2 && shape[1][0] == 1 && shape[0][1] == 1)
+            return 2; // 🟢 Green - S Piece
+        if (shape.size() == 2 && shape[1][0] == 1)
+            return 6; // 🟠 Orange - J Piece
+        if (shape.size() == 2 && shape[0][2] == 1)
+            return 5; // 🟤 Brown - L Piece
+
+        return 7; // Default white
+    }
+
     void draw()
     {
         COORD cursorPosition;
@@ -160,19 +185,37 @@ public:
                         {
                             int x = currentPiece->x + pj;
                             int y = currentPiece->y + pi;
+
                             if (currentPiece->shape[pi][pj] && x == j && y == i)
                             {
+                                // ✅ Apply the correct color based on piece type
+                                setColor(getPieceColor(currentPiece->shape));
                                 std::cout << "O ";
+                                setColor(7); // Reset color to white
                                 isPieceCell = true;
                             }
                         }
                     }
                 }
+
                 if (!isPieceCell)
-                    std::cout << (grid[i][j] ? "X " : ". ");
+                {
+                    if (grid[i][j])
+                    {
+                        // ✅ Retain the color of placed blocks
+                        setColor(grid[i][j]);
+                        std::cout << "O ";
+                        setColor(7);
+                    }
+                    else
+                    {
+                        std::cout << ". ";
+                    }
+                }
             }
             std::cout << std::endl;
         }
+
         std::cout << "Score: " << score << std::endl;
     }
 
