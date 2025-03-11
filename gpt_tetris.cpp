@@ -12,8 +12,10 @@ class Tetromino
 public:
     std::vector<std::vector<int>> shape;
     int x, y;
+    int color; // ✅ Fixed color for this piece
 
-    Tetromino(std::vector<std::vector<int>> s, int startX, int startY) : shape(s), x(startX), y(startY) {}
+    Tetromino(std::vector<std::vector<int>> s, int startX, int startY, int c)
+        : shape(s), x(startX), y(startY), color(c) {}
 
     void rotate()
     {
@@ -37,7 +39,7 @@ private:
     int score;
     int speed;
 
-    std::vector<std::vector<int>> getRandomPiece()
+    Tetromino *getRandomPiece()
     {
         std::vector<std::vector<std::vector<int>>> pieces = {
             {{1, 1, 1, 1}},         // I
@@ -48,7 +50,11 @@ private:
             {{1, 0, 0}, {1, 1, 1}}, // J
             {{0, 0, 1}, {1, 1, 1}}  // L
         };
-        return pieces[rand() % pieces.size()];
+
+        int color[] = {9, 14, 13, 2, 4, 6, 5}; // ✅ Fixed color for each piece
+
+        int index = rand() % pieces.size();
+        return new Tetromino(pieces[index], WIDTH / 2 - pieces[index][0].size() / 2, -2, color[index]);
     }
 
     bool isValidMove(Tetromino *piece, int newX, int newY)
@@ -84,7 +90,7 @@ private:
 
                     // ✅ Ignore any blocks that are placed above the screen
                     if (yPos >= 0)
-                        grid[yPos][xPos] = getPieceColor(currentPiece->shape);
+                        grid[yPos][xPos] = currentPiece->color;
                 }
             }
         }
@@ -148,19 +154,19 @@ public:
     int getPieceColor(const std::vector<std::vector<int>> &shape)
     {
         if (shape.size() == 1 || shape[0].size() == 4)
-            return 9; // 🔵 Blue - I Piece
+            return 9; 
         if (shape.size() == 2 && shape[0].size() == 2)
-            return 14; // 🟡 Yellow - O Piece
+            return 14; 
         if (shape.size() == 2 && shape[0].size() == 3 && shape[1][0] == 1 && shape[1][2] == 1)
-            return 13; // 🟣 Purple - T Piece
+            return 13;
         if (shape.size() == 2 && shape[0][1] == 1 && shape[1][2] == 1)
-            return 4; // 🔴 Red - Z Piece
+            return 4; 
         if (shape.size() == 2 && shape[1][0] == 1 && shape[0][1] == 1)
-            return 2; // 🟢 Green - S Piece
+            return 2; 
         if (shape.size() == 2 && shape[1][0] == 1)
-            return 6; // 🟠 Orange - J Piece
+            return 3; 
         if (shape.size() == 2 && shape[0][2] == 1)
-            return 5; // 🟤 Brown - L Piece
+            return 8;
 
         return 7; // Default white
     }
@@ -189,7 +195,7 @@ public:
                             if (currentPiece->shape[pi][pj] && x == j && y == i)
                             {
                                 // ✅ Apply the correct color based on piece type
-                                setColor(getPieceColor(currentPiece->shape));
+                                setColor(currentPiece->color);
                                 std::cout << "O ";
                                 setColor(7); // Reset color to white
                                 isPieceCell = true;
@@ -204,7 +210,7 @@ public:
                     {
                         // ✅ Retain the color of placed blocks
                         setColor(grid[i][j]);
-                        std::cout << "O ";
+                        std::cout << "X ";
                         setColor(7);
                     }
                     else
@@ -223,8 +229,7 @@ public:
     {
         if (!currentPiece)
         {
-            std::vector<std::vector<int>> pieceShape = getRandomPiece();
-            currentPiece = new Tetromino(pieceShape, WIDTH / 2 - pieceShape[0].size() / 2, -2);
+            currentPiece = getRandomPiece();
         }
 
         if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
