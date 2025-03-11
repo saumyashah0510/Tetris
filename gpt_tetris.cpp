@@ -79,7 +79,12 @@ private:
             {
                 if (currentPiece->shape[i][j])
                 {
-                    grid[currentPiece->y + i][currentPiece->x + j] = 1;
+                    int yPos = currentPiece->y + i;
+                    int xPos = currentPiece->x + j;
+
+                    // ✅ Ignore any blocks that are placed above the screen
+                    if (yPos >= 0)
+                        grid[yPos][xPos] = 1;
                 }
             }
         }
@@ -247,16 +252,33 @@ public:
         std::cout << "==========================" << std::endl;
         std::cout << "        GAME OVER!        " << std::endl;
         std::cout << "     Final Score: " << score << std::endl;
-        std::cout << " Press any key to restart..." << std::endl;
         std::cout << "==========================" << std::endl;
-        _getch();
+        std::cout << "[1] Restart Game" << std::endl;
+        std::cout << "[2] Exit Game" << std::endl;
+        std::cout << "==========================" << std::endl;
+
+        char choice;
+        while (true)
+        {
+            choice = _getch();
+            if (choice == '1')
+            {
+                resetGame();
+                break;
+            }
+            else if (choice == '2')
+            {
+                exit(0);
+            }
+        }
     }
 
     bool isGameOver()
     {
         for (int i = 0; i < WIDTH; ++i)
         {
-            if (grid[0][i])
+            // ✅ Only consider game over if a BLOCK has SETTLED on row 0
+            if (grid[0][i] && currentPiece == nullptr)
                 return true;
         }
         return false;
