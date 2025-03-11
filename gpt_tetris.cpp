@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <ctime>
+#include <fstream> // Add this for file handling
 
 const int WIDTH = 10;
 const int HEIGHT = 20;
@@ -38,6 +39,31 @@ private:
     Tetromino *currentPiece;
     int score;
     int speed;
+    int highScore;
+
+    void loadHighScore()
+    {
+        std::ifstream file("highscore.txt");
+        if (file.is_open())
+        {
+            file >> highScore;
+            file.close();
+        }
+        else
+        {
+            highScore = 0; // Default value if no file exists
+        }
+    }
+
+    void saveHighScore()
+    {
+        std::ofstream file("highscore.txt");
+        if (file.is_open())
+        {
+            file << highScore;
+            file.close();
+        }
+    }
 
     Tetromino *getRandomPiece()
     {
@@ -125,13 +151,27 @@ private:
 
     void clearScreen()
     {
-        system("cls"); // Clear the console screen
+        COORD topLeft = {0, 0};
+        HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO screen;
+        DWORD written;
+
+        // Get the number of character cells in the current buffer
+        GetConsoleScreenBufferInfo(console, &screen);
+        DWORD cells = screen.dwSize.X * screen.dwSize.Y;
+
+        // Fill the entire screen with spaces
+        FillConsoleOutputCharacter(console, ' ', cells, topLeft, &written);
+
+        // Reset the cursor to the top left
+        SetConsoleCursorPosition(console, topLeft);
     }
 
 public:
     Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), currentPiece(nullptr), score(0), speed(300)
     {
         srand(static_cast<unsigned int>(time(0)));
+        loadHighScore();
         clearScreen();
     }
 
@@ -154,17 +194,17 @@ public:
     int getPieceColor(const std::vector<std::vector<int>> &shape)
     {
         if (shape.size() == 1 || shape[0].size() == 4)
-            return 9; 
+            return 9;
         if (shape.size() == 2 && shape[0].size() == 2)
-            return 14; 
+            return 14;
         if (shape.size() == 2 && shape[0].size() == 3 && shape[1][0] == 1 && shape[1][2] == 1)
             return 13;
         if (shape.size() == 2 && shape[0][1] == 1 && shape[1][2] == 1)
-            return 4; 
+            return 4;
         if (shape.size() == 2 && shape[1][0] == 1 && shape[0][1] == 1)
-            return 2; 
+            return 2;
         if (shape.size() == 2 && shape[1][0] == 1)
-            return 3; 
+            return 3;
         if (shape.size() == 2 && shape[0][2] == 1)
             return 8;
 
@@ -222,7 +262,7 @@ public:
             std::cout << std::endl;
         }
 
-        std::cout << "Score: " << score << std::endl;
+        std::cout << "Score: " << score << "   High Score: " << highScore << std::endl;
     }
 
     void update()
@@ -291,11 +331,17 @@ public:
         grid.assign(HEIGHT, std::vector<int>(WIDTH, 0));
         score = 0;
         speed = 300;
-        system("cls"); // ✅ Clear screen when restarting
+        clearScreen();
     }
 
     void showGameOver()
     {
+
+        if (score > highScore)
+        {
+            highScore = score;
+            saveHighScore(); // Save the new high score
+        }
         system("cls"); // ✅ Clear screen when Game Over
         std::cout << "==========================" << std::endl;
         std::cout << "        GAME OVER!        " << std::endl;
