@@ -53,7 +53,7 @@ A console-based Tetris game built in C++ with colorful blocks, scoring system, a
 
 2. **Compile the Code Using g++ compiler:**
     ```bash
-    g++ main.cpp -o tetris -lwinmm
+    g++ tetris.cpp -o tetris -lwinmm
 
 3. **Run the game**
     ```bash
