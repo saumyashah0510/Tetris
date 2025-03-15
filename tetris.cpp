@@ -372,6 +372,8 @@ public:
         score = 0;
         speed = 300;
         clearScreen();
+
+        PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC |SND_LOOP);
     }
 
     void showGameOver()
