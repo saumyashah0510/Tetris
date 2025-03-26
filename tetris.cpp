@@ -5,6 +5,8 @@
 #include <ctime>   // For generating random pieces
 #include <fstream> //For file handling
 
+using namespace std;
+
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
 
@@ -46,6 +48,7 @@ class Game
 private:
     std::vector<std::vector<int>> grid;
     Tetromino *currentPiece;
+    Tetromino *nextPiece;
     int score;
     int speed;
     int highScore;
@@ -95,8 +98,9 @@ private:
         return new Tetromino(pieces[index], WIDTH / 2 - pieces[index][0].size() / 2, -2, color[index]);
     }
 
-    bool isValidMove(Tetromino *piece, int newX, int newY)
+    bool isValidMove(Tetromino *piece, int newX, int newY, bool isRotation = false)
     {
+        // Check all blocks in the piece's shape
         for (size_t i = 0; i < piece->shape.size(); ++i)
         {
             for (size_t j = 0; j < piece->shape[0].size(); ++j)
@@ -105,9 +109,32 @@ private:
                 {
                     int x = newX + j;
                     int y = newY + i;
-                    if (x < 0 || x >= WIDTH || y >= HEIGHT || (y >= 0 && grid[y][x]))
+
+                    // Boundary checks
+                    if (x < 0 || x >= WIDTH || y >= HEIGHT)
                     {
                         return false;
+                    }
+
+                    // Collision with existing blocks
+                    if (y >= 0 && grid[y][x])
+                    {
+                        return false;
+                    }
+
+                    // Additional rotation safety checks
+                    if (isRotation)
+                    {
+                        // Check one block below each piece block
+                        if (y + 1 < HEIGHT && grid[y + 1][x])
+                        {
+                            return false;
+                        }
+                        // Check if rotation would push piece into floor
+                        if (y >= HEIGHT - piece->shape.size())
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -117,6 +144,35 @@ private:
 
     void placePiece()
     {
+
+        for (size_t i = 0; i < currentPiece->shape.size(); ++i)
+        {
+            for (size_t j = 0; j < currentPiece->shape[0].size(); ++j)
+            {
+                if (currentPiece->shape[i][j])
+                {
+                    int yPos = currentPiece->y + i;
+                    int xPos = currentPiece->x + j;
+
+                    // Boundary safety checks
+                    if (yPos < 0)
+                    {
+                        // Piece is above the grid - allow placement but don't draw
+                        continue;
+                    }
+
+                    if (xPos < 0 || xPos >= WIDTH || yPos >= HEIGHT)
+                    {
+                        // This should never happen if isValidMove() is working properly
+                        showGameOver();
+                        delete currentPiece;
+                        currentPiece = nullptr;
+                        return;
+                    }
+                }
+            }
+        }
+
         for (size_t i = 0; i < currentPiece->shape.size(); ++i)
         {
             for (size_t j = 0; j < currentPiece->shape[0].size(); ++j)
@@ -134,6 +190,13 @@ private:
         }
         delete currentPiece;
         currentPiece = nullptr;
+
+        // Immediately check if the placed piece caused a game over
+        if (isGameOver())
+        {
+            showGameOver();
+            resetGame();
+        }
     }
 
     void clearLines()
@@ -163,7 +226,7 @@ private:
 
 public:
     // constructor initializing empty grid , piece, score and speed
-    Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), currentPiece(nullptr), score(0), speed(300)
+    Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), currentPiece(nullptr), nextPiece(getRandomPiece()), score(0), speed(300)
     {
         srand(static_cast<unsigned int>(time(0)));
         loadHighScore();
@@ -175,6 +238,8 @@ public:
     {
         if (currentPiece)
             delete currentPiece;
+        if (nextPiece)
+            delete nextPiece;
     }
 
     int getSpeed()
@@ -207,6 +272,19 @@ public:
         return 7; // Default white
     }
 
+    int calculateGhostY()
+    {
+        if (!currentPiece)
+            return 0;
+
+        int ghostY = currentPiece->y;
+        while (isValidMove(currentPiece, currentPiece->x, ghostY + 1))
+        {
+            ghostY++;
+        }
+        return ghostY;
+    }
+
     void draw()
     {
         COORD cursorPosition;
@@ -214,11 +292,67 @@ public:
         cursorPosition.Y = 0;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 
+        setColor(7); // White color for borders
+
+        // Top border - now matches grid width
+        std::cout << char(219);
+        for (int j = 0; j < WIDTH * 2; j++)
+            std::cout << char(219);
+        std::cout << char(219) << "  Next Piece:";
+
+        // Clear the next piece area (4 rows should be enough for any piece)
+        for (int i = 1; i <= 4; i++)
+        {
+            cursorPosition.X = WIDTH * 2 + 4;
+            cursorPosition.Y = i;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+            std::cout << "        "; // Clear about 4 blocks width
+        }
+
+        // Draw next piece preview
+        if (nextPiece)
+        {
+            for (size_t pi = 0; pi < nextPiece->shape.size(); ++pi)
+            {
+                cursorPosition.X = WIDTH * 2 + 4;
+                cursorPosition.Y = pi + 1;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+
+                for (size_t pj = 0; pj < nextPiece->shape[0].size(); ++pj)
+                {
+                    if (nextPiece->shape[pi][pj])
+                    {
+                        setColor(nextPiece->color);
+                        std::cout << "[]";
+                        setColor(7);
+                    }
+                    else
+                    {
+                        std::cout << "  ";
+                    }
+                }
+            }
+        }
+        std::cout << "\n";
+
+        // ... rest of the existing draw function ...
+
+        // Calculate ghost position
+        int ghostY = calculateGhostY();
+
         for (int i = 0; i < HEIGHT; ++i)
         {
+            cursorPosition.X = 0;
+            cursorPosition.Y = i + 1;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+
+            std::cout << char(219); // Left border
             for (int j = 0; j < WIDTH; ++j)
             {
                 bool isPieceCell = false;
+                bool isGhostCell = false;
+
+                // First check for actual piece (so it draws on top)
                 if (currentPiece)
                 {
                     for (size_t pi = 0; pi < currentPiece->shape.size(); ++pi)
@@ -230,36 +364,86 @@ public:
 
                             if (currentPiece->shape[pi][pj] && x == j && y == i)
                             {
-                                // Apply the correct color based on piece type
                                 setColor(currentPiece->color);
-                                std::cout << "O ";
-                                setColor(7); // Reset color to white
+                                std::cout << "[]";
+                                setColor(7);
                                 isPieceCell = true;
                             }
                         }
                     }
                 }
 
-                if (!isPieceCell)
+                // Then draw ghost piece (only if not overlapping with actual piece)
+                if (!isPieceCell && currentPiece && i >= ghostY && i < ghostY + (int)currentPiece->shape.size())
+                {
+                    for (size_t pi = 0; pi < currentPiece->shape.size(); ++pi)
+                    {
+                        for (size_t pj = 0; pj < currentPiece->shape[0].size(); ++pj)
+                        {
+                            int x = currentPiece->x + pj;
+                            int y = ghostY + pi;
+
+                            if (currentPiece->shape[pi][pj] && x == j && y == i)
+                            {
+                                // Check if this cell is on the border of the piece
+                                bool isBorder = false;
+
+                                // Left edge
+                                if (pj == 0 || !currentPiece->shape[pi][pj - 1])
+                                    isBorder = true;
+                                // Right edge
+                                else if (pj == currentPiece->shape[0].size() - 1 || !currentPiece->shape[pi][pj + 1])
+                                    isBorder = true;
+                                // Top edge
+                                else if (pi == 0 || !currentPiece->shape[pi - 1][pj])
+                                    isBorder = true;
+                                // Bottom edge
+                                else if (pi == currentPiece->shape.size() - 1 || !currentPiece->shape[pi + 1][pj])
+                                    isBorder = true;
+
+                                if (isBorder)
+                                {
+                                    setColor(8);                         // Grey color for ghost
+                                    std::cout << char(219) << char(219); // Two block characters
+                                    setColor(7);
+                                    isGhostCell = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Draw grid cells (only if neither piece nor ghost is here)
+                if (!isPieceCell && !isGhostCell)
                 {
                     if (grid[i][j])
                     {
-                        // Retain the color of placed blocks
                         setColor(grid[i][j]);
-                        std::cout << "X ";
+                        std::cout << "[]";
                         setColor(7);
                     }
                     else
                     {
-                        std::cout << ". ";
+                        std::cout << "  ";
                     }
                 }
             }
-            std::cout << std::endl;
+            std::cout << char(219); // Right border
+            std::cout << "\n";
         }
 
+        // Bottom border - matches grid width
         cursorPosition.X = 0;
-        cursorPosition.Y = HEIGHT;
+        cursorPosition.Y = HEIGHT + 1;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
+        std::cout << char(219);
+        for (int j = 0; j < WIDTH * 2; j++)
+            std::cout << char(219);
+        std::cout << char(219) << "\n";
+
+        // Score display
+        cursorPosition.X = 0;
+        cursorPosition.Y = HEIGHT + 2;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
         std::cout << "Score: " << score << "   High Score: " << highScore << "  ";
     }
@@ -268,9 +452,11 @@ public:
     {
         if (!currentPiece)
         {
-            currentPiece = getRandomPiece();
+            currentPiece = nextPiece;
+            nextPiece = getRandomPiece();
         }
 
+        // Handle automatic falling
         if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
         {
             currentPiece->y++;
@@ -287,6 +473,7 @@ public:
             }
         }
 
+        // Handle keyboard input
         if (_kbhit())
         {
             char key = _getch();
@@ -299,18 +486,57 @@ public:
                     if (isValidMove(currentPiece, currentPiece->x - 1, currentPiece->y))
                         currentPiece->x--;
                     break;
+
                 case 77: // Right arrow key
                     if (isValidMove(currentPiece, currentPiece->x + 1, currentPiece->y))
                         currentPiece->x++;
                     break;
+
                 case 72: // Up arrow key (Rotate)
                 {
                     Tetromino temp = *currentPiece;
                     temp.rotate();
-                    if (isValidMove(&temp, temp.x, temp.y))
+
+                    // Try normal rotation first
+                    if (isValidMove(&temp, temp.x, temp.y, true))
+                    {
                         currentPiece->rotate();
+                    }
+                    // Try wall kicks if normal rotation fails
+                    else
+                    {
+                        // Try shifting left
+                        if (isValidMove(&temp, temp.x - 1, temp.y, true))
+                        {
+                            currentPiece->rotate();
+                            currentPiece->x--;
+                        }
+                        // Try shifting right
+                        else if (isValidMove(&temp, temp.x + 1, temp.y, true))
+                        {
+                            currentPiece->rotate();
+                            currentPiece->x++;
+                        }
+                        // Try shifting up (for ceiling kicks)
+                        else if (isValidMove(&temp, temp.x, temp.y - 1, true))
+                        {
+                            currentPiece->rotate();
+                            currentPiece->y--;
+                        }
+                    }
+
+                    // Final wall boundary check (Step 3)
+                    if (currentPiece->x < 0)
+                    {
+                        currentPiece->x = 0;
+                    }
+                    if (currentPiece->x + currentPiece->shape[0].size() > WIDTH)
+                    {
+                        currentPiece->x = WIDTH - currentPiece->shape[0].size();
+                    }
                     break;
                 }
+
                 case 80: // Down arrow key (Soft drop)
                     if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
                         currentPiece->y++;
@@ -327,6 +553,7 @@ public:
                     placePiece();
                     clearLines();
                     break;
+
                 case 27: // ESC key (Pause)
                     pauseGame();
                     break;
@@ -356,7 +583,7 @@ public:
             {
                 clearScreen();
                 draw();
-                PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC |SND_LOOP);
+                PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC | SND_LOOP);
                 break;
             }
             else if (choice == '2')
@@ -373,7 +600,7 @@ public:
         speed = 300;
         clearScreen();
 
-        PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC |SND_LOOP);
+        PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC | SND_LOOP);
     }
 
     void showGameOver()
@@ -477,5 +704,5 @@ void showWelcomeScreen()
 
     _getch(); // Wait for any key press
     clearScreen();
-    PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC |SND_LOOP);
+    PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC | SND_LOOP);
 }
