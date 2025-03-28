@@ -1,42 +1,51 @@
-# Tetris (C++)
+# 🎮 Tetris (C++)
+Experience the nostalgia of Tetris in your terminal! This C++ implementation features colorful blocks, smooth controls, and a scoring system with high-score saving. Perfect for both casual gaming and coding inspiration!
 
-## Description:
-A console-based Tetris game built in C++ with colorful blocks, scoring system, and high-score saving. Enjoy a classic Tetris experience with intuitive controls and a nostalgic feel. 
-<br>
+## 👥 Team: Silicon Syndicates
+| Member            | ID       |
+|-------------------|----------|
+| Saumya Shah       | 202401472|
+| Manav Shah        | 202404038|
+| Pranshu Vaghani   | 202404030|
+| Krishh Agrawal    | 202404017|
 
-## Team: Silicon Syndicates
-202401472 - Saumya Shah <br>
-202404038 - Manav Shah  <br>
-202404030 - Pranshu Vaghani <br>
-202404017 - Krishh Agrawal <br>
+## 🚀 Features
+- Classic Tetris gameplay
+- Color-coded Tetromino pieces (I, O, T, S, Z, J, L)
+- Scoring system with high score tracking
+- Pause/Resume functionality
+- Soft drop (faster fall) and Hard drop (instant fall)
+- Ghost piece preview
+- Sound effects
 
-## 🚀Features:
-✅ Classic Tetris gameplay  
-✅ Color-coded Tetromino pieces  
-✅ Scoring system with high score tracking  
-✅ Pause and Resume feature  
-✅ Soft drop and Hard drop for faster gameplay  
-✅ Save and load high scores automatically  
-✅ Sound effects to enhance the gaming experience
-
-<br>
-
-## 🎮 Controls
+## 🕹️ Controls
 | Key          | Action                  |
-|:--------------|:------------------------|
-| **Left Arrow**   | Move piece left          |
-| **Right Arrow**  | Move piece right         |
-| **Up Arrow**      | Rotate piece clockwise   |
-| **Down Arrow**    | Soft drop (faster fall)  |
-| **Spacebar**      | Hard drop (instant fall) |
-| **ESC**           | Pause the game           |
-
-<br>
+|--------------|-------------------------|
+| ← → Arrow    | Move piece left/right   |
+| ↑ Arrow      | Rotate piece            |
+| ↓ Arrow      | Soft drop               |
+| Spacebar     | Hard drop               |
+| ESC          | Pause game              |
 
 ## 📋 How to Play
-1. **Stack blocks** to form complete horizontal lines.
-2. **Completed lines** will be cleared, and points will be awarded.
-3. The game ends when the **blocks reach the top** of the grid.
+1. Stack blocks to form complete horizontal lines
+2. Completed lines will clear and award points
+3. Game ends when blocks reach the top
+
+## 🏆 Scoring
+| Lines Cleared | Points |
+|---------------|--------|
+| 1             | 100    |
+| 2             | 300    |
+| 3             | 500    |
+| 4             | 800    |
+Speed increases with higher scores
+
+## 🛠️ Installation
+### Prerequisites
+- Windows OS
+- C++ Compiler (g++/MinGW)
+
 
 <br>
 
@@ -58,13 +67,6 @@ A console-based Tetris game built in C++ with colorful blocks, scoring system, a
 3. **Run the game**
     ```bash
     ./tetris.exe
-
-<br>
-
-## 🏆 Scoring System
-- 100 Points for each completed line
-- Game speed increases as you score more points
-- Achieving a new high score will save automatically
 
 <br>
 

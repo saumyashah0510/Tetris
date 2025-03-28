@@ -564,26 +564,115 @@ void clearScreen()
 void showWelcomeScreen()
 {
     clearScreen();
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // Title
+    SetConsoleTextAttribute(hConsole, 13); // Purple
     std::cout << "=====================================\n";
     std::cout << "         WELCOME TO TETRIS\n";
-    std::cout << "=====================================\n";
-    std::cout << "\n";
+    std::cout << "=====================================\n\n";
+
+    // Controls header
+    SetConsoleTextAttribute(hConsole, 11); // Light cyan
     std::cout << "CONTROLS:\n";
-    std::cout << "  - Left Arrow     : Move Left\n";
-    std::cout << "  - Right Arrow    : Move Right\n";
-    std::cout << "  - Up Arrow       : Rotate Piece\n";
-    std::cout << "  - Down Arrow     : Soft Drop (Faster fall)\n";
-    std::cout << "  - Spacebar       : Hard Drop (Instant fall)\n";
-    std::cout << "  - ESC            : Pause Game\n";
-    std::cout << "\n";
+
+    // Controls items
+    SetConsoleTextAttribute(hConsole, 7); // White
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 10); // Light green
+    std::cout << "Left Arrow";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "     : Move Left\n";
+
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 10);
+    std::cout << "Right Arrow";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "    : Move Right\n";
+
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 10);
+    std::cout << "Up Arrow";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "       : Rotate Piece\n";
+
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 10);
+    std::cout << "Down Arrow";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "     : Soft Drop (Faster fall)\n";
+
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 10);
+    std::cout << "Spacebar";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "       : Hard Drop (Instant fall)\n";
+
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 10);
+    std::cout << "ESC";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "            : Pause Game\n\n";
+
+    // Scoring header
+    SetConsoleTextAttribute(hConsole, 11); // Light cyan
+    std::cout << "SCORING:\n";
+
+    // Scoring items with colors matching the pieces
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 9); // Cyan (I piece)
+    std::cout << "1 line";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << " cleared: ";
+    SetConsoleTextAttribute(hConsole, 14); // Yellow
+    std::cout << "100 points\n";
+
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 2); // Green (S piece)
+    std::cout << "2 lines";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << " cleared: ";
+    SetConsoleTextAttribute(hConsole, 14);
+    std::cout << "300 points\n";
+
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 4); // Red (Z piece)
+    std::cout << "3 lines";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << " cleared: ";
+    SetConsoleTextAttribute(hConsole, 14);
+    std::cout << "500 points\n";
+
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << "  - ";
+    SetConsoleTextAttribute(hConsole, 5); // Purple (T piece)
+    std::cout << "4 lines";
+    SetConsoleTextAttribute(hConsole, 7);
+    std::cout << " cleared: ";
+    SetConsoleTextAttribute(hConsole, 14);
+    std::cout << "800 points\n\n";
+
+    // How to play
+    SetConsoleTextAttribute(hConsole, 11); // Light cyan
     std::cout << "HOW TO PLAY:\n";
+    SetConsoleTextAttribute(hConsole, 7); // White
     std::cout << "  - Stack blocks to form complete lines.\n";
     std::cout << "  - Completed lines will clear and give you points.\n";
-    std::cout << "  - The game ends when blocks reach the top.\n";
-    std::cout << "\n";
+    std::cout << "  - The game ends when blocks reach the top.\n\n";
+
+    // Footer
+    SetConsoleTextAttribute(hConsole, 13); // Purple
     std::cout << "=====================================\n";
+    SetConsoleTextAttribute(hConsole, 10); // Light green
     std::cout << "  PRESS ANY KEY TO START THE GAME\n";
+    SetConsoleTextAttribute(hConsole, 13);
     std::cout << "=====================================\n";
+
+    SetConsoleTextAttribute(hConsole, 7); // Reset to white
 
     _getch();
     clearScreen();
