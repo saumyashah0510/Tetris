@@ -39,15 +39,8 @@ Experience the nostalgia of Tetris in your terminal! This C++ implementation fea
 | 2             | 300    |
 | 3             | 500    |
 | 4             | 800    |
+
 Speed increases with higher scores
-
-## 🛠️ Installation
-### Prerequisites
-- Windows OS
-- C++ Compiler (g++/MinGW)
-
-
-<br>
 
 ## 🖥️ Installation and Running the Game
 ### Prerequisites
