@@ -20,35 +20,71 @@ void clearScreen();
 class Tetromino
 {
 public:
-    std::vector<std::vector<int>> shape;
-    int x, y;
-    int color; // Fixed color for this piece
-
-    // constructor
-    Tetromino(std::vector<std::vector<int>> s, int startX, int startY, int c)
-        : shape(s), x(startX), y(startY), color(c) {}
-
-    // rotates pieces 90 degrees clockwise
-    void rotate()
+    struct Shape
     {
-        std::vector<std::vector<int>> rotated(shape[0].size(), std::vector<int>(shape.size()));
-        for (size_t i = 0; i < shape.size(); ++i)
+        char name;
+        int states[4][4][4];
+        int currState = 0;
+    };
+
+    static Shape shapes[7];
+
+    Shape generateTetromino()
+    {
+        return shapes[rand() % 7];
+    }
+
+    static string getColor(char type)
+    {
+        switch (type)
         {
-            for (size_t j = 0; j < shape[0].size(); ++j)
-            {
-                rotated[j][shape.size() - 1 - i] = shape[i][j];
-            }
+        case 'I':
+            return "9"; // Cyan
+        case 'O':
+            return "14"; // Yellow
+        case 'T':
+            return "13"; // Magenta
+        case 'S':
+            return "2"; // Green
+        case 'Z':
+            return "4"; // Red
+        case 'J':
+            return "1"; // Blue
+        case 'L':
+            return "6"; // White
+        default:
+            return "7"; // Default white
         }
-        shape = rotated;
+    }
+
+    static void rotate(Shape &t)
+    {
+        t.currState = (t.currState + 1) % 4;
     }
 };
+
+Tetromino::Shape Tetromino::shapes[7] = {
+    {'I', {{{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 0, 1, 0}, {0, 0, 1, 0}, {0, 0, 1, 0}, {0, 0, 1, 0}}, {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 0, 1, 0}, {0, 0, 1, 0}, {0, 0, 1, 0}, {0, 0, 1, 0}}}, 0},
+
+    {'O', {{{1, 1, 0, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{1, 1, 0, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{1, 1, 0, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{1, 1, 0, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}}, 0},
+
+    {'T', {{{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 1, 0, 0}, {0, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}, {{0, 0, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}, {{0, 1, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}}, 0},
+
+    {'S', {{{0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 1, 0}, {0, 0, 0, 0}}, {{0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 1, 0}, {0, 0, 0, 0}}}, 0},
+
+    {'Z', {{{1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 0, 1, 0}, {0, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}, {{1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 0, 1, 0}, {0, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}}, 0},
+
+    {'J', {{{1, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 1, 1, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}, {{0, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 1, 0}, {0, 0, 0, 0}}, {{0, 1, 0, 0}, {0, 1, 0, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}}}, 0},
+
+    {'L', {{{0, 0, 1, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, {{0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}}, {{0, 0, 0, 0}, {1, 1, 1, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}}, {{1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}}, 0}};
 
 class Game
 {
 private:
     std::vector<std::vector<int>> grid;
-    Tetromino *currentPiece;
-    Tetromino *nextPiece;
+    Tetromino::Shape currentPiece;
+    Tetromino::Shape nextPiece;
+    int pieceX, pieceY;
     int score;
     int speed;
     int highScore;
@@ -80,209 +116,146 @@ private:
         }
     }
 
-    Tetromino *getRandomPiece()
+    bool collided(int x, int y, const Tetromino::Shape &t)
     {
-        std::vector<std::vector<std::vector<int>>> pieces = {
-            {{1, 1, 1, 1}},         // I
-            {{1, 1}, {1, 1}},       // O
-            {{0, 1, 0}, {1, 1, 1}}, // T
-            {{0, 1, 1}, {1, 1, 0}}, // S
-            {{1, 1, 0}, {0, 1, 1}}, // Z
-            {{1, 0, 0}, {1, 1, 1}}, // J
-            {{0, 0, 1}, {1, 1, 1}}  // L
-        };
-
-        int color[] = {9, 14, 13, 2, 4, 6, 5}; // Fixed color for each piece
-
-        int index = rand() % pieces.size();
-        return new Tetromino(pieces[index], WIDTH / 2 - pieces[index][0].size() / 2, -2, color[index]);
-    }
-
-    bool isValidMove(Tetromino *piece, int newX, int newY, bool isRotation = false)
-    {
-        // Check all blocks in the piece's shape
-        for (size_t i = 0; i < piece->shape.size(); ++i)
+        for (int i = 0; i < 4; i++)
         {
-            for (size_t j = 0; j < piece->shape[0].size(); ++j)
+            for (int j = 0; j < 4; j++)
             {
-                if (piece->shape[i][j])
-                {
-                    int x = newX + j;
-                    int y = newY + i;
+                if (t.states[t.currState][i][j] == 0)
+                    continue;
 
-                    // Boundary checks
-                    if (x < 0 || x >= WIDTH || y >= HEIGHT)
-                    {
-                        return false;
-                    }
+                int newX = x + j;
+                int newY = y + i;
 
-                    // Collision with existing blocks
-                    if (y >= 0 && grid[y][x])
-                    {
-                        return false;
-                    }
-
-                    // Additional rotation safety checks
-                    if (isRotation)
-                    {
-                        // Check one block below each piece block
-                        if (y + 1 < HEIGHT && grid[y + 1][x])
-                        {
-                            return false;
-                        }
-                        // Check if rotation would push piece into floor
-                        if (y >= HEIGHT - piece->shape.size())
-                        {
-                            return false;
-                        }
-                    }
-                }
+                if (newX < 0 || newX >= WIDTH || newY >= HEIGHT)
+                    return true;
+                if (newY >= 0 && grid[newY][newX] != 0)
+                    return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    int findGhostY()
+    {
+        int ghostY = pieceY;
+        while (!collided(pieceX, ghostY + 1, currentPiece))
+        {
+            ghostY++;
+        }
+        return ghostY;
     }
 
     void placePiece()
     {
-
-        for (size_t i = 0; i < currentPiece->shape.size(); ++i)
+        for (int i = 0; i < 4; i++)
         {
-            for (size_t j = 0; j < currentPiece->shape[0].size(); ++j)
+            for (int j = 0; j < 4; j++)
             {
-                if (currentPiece->shape[i][j])
+                if (currentPiece.states[currentPiece.currState][i][j] == 1)
                 {
-                    int yPos = currentPiece->y + i;
-                    int xPos = currentPiece->x + j;
+                    int x = pieceX + j;
+                    int y = pieceY + i;
 
-                    // Boundary safety checks
-                    if (yPos < 0)
+                    if (y >= 0 && x >= 0 && x < WIDTH && y < HEIGHT)
                     {
-                        // Piece is above the grid - allow placement but don't draw
-                        continue;
-                    }
-
-                    if (xPos < 0 || xPos >= WIDTH || yPos >= HEIGHT)
-                    {
-                        // This should never happen if isValidMove() is working properly
-                        showGameOver();
-                        delete currentPiece;
-                        currentPiece = nullptr;
-                        return;
+                        grid[y][x] = stoi(Tetromino::getColor(currentPiece.name));
                     }
                 }
             }
         }
+        clearLines();
 
-        for (size_t i = 0; i < currentPiece->shape.size(); ++i)
+        // Get new piece
+        currentPiece = nextPiece;
+        nextPiece = Tetromino().generateTetromino();
+        pieceX = WIDTH / 2 - 2;
+        pieceY = 0;
+
+        if (collided(pieceX, pieceY, currentPiece))
         {
-            for (size_t j = 0; j < currentPiece->shape[0].size(); ++j)
-            {
-                if (currentPiece->shape[i][j])
-                {
-                    int yPos = currentPiece->y + i;
-                    int xPos = currentPiece->x + j;
-
-                    // ✅ Ignore any blocks that are placed above the screen
-                    if (yPos >= 0 && xPos >= 0 && xPos < grid[0].size())
-                        grid[yPos][xPos] = currentPiece->color;
-                }
-            }
-        }
-        delete currentPiece;
-        currentPiece = nullptr;
-
-        // Immediately check if the placed piece caused a game over
-        if (isGameOver())
-        {
-            showGameOver();
-            resetGame();
+            gameOver = true;
         }
     }
 
     void clearLines()
     {
-        for (int i = HEIGHT - 1; i >= 0; --i)
+        int linesCleared = 0;
+
+        // Start from bottom and move up
+        for (int y = HEIGHT - 1; y >= 0; y--)
         {
             bool full = true;
-            for (int j = 0; j < WIDTH; ++j)
+            for (int x = 0; x < WIDTH; x++)
             {
-                if (!grid[i][j])
+                if (grid[y][x] == 0)
                 {
                     full = false;
                     break;
                 }
             }
+
             if (full)
             {
-                grid.erase(grid.begin() + i);
+                // Remove the full line
+                grid.erase(grid.begin() + y);
+                // Add a new empty line at the top
                 grid.insert(grid.begin(), std::vector<int>(WIDTH, 0));
+                linesCleared++;
+                y++; // Important: After erasing and inserting, check the same y again
+            }
+        }
+
+        // Update score based on lines cleared
+        if (linesCleared > 0)
+        {
+            switch (linesCleared)
+            {
+            case 1:
                 score += 100;
-                speed -= 10;
-                if (speed < 50)
-                    speed = 50;
+                break;
+            case 2:
+                score += 300;
+                break;
+            case 3:
+                score += 500;
+                break;
+            case 4:
+                score += 800;
+                break;
+            }
+
+            // Increase speed slightly to make game harder
+            if (speed > 100)
+                speed -= 5;
+
+            if (score > highScore)
+            {
+                highScore = score;
+                saveHighScore();
             }
         }
     }
 
 public:
-    // constructor initializing empty grid , piece, score and speed
-    Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), currentPiece(nullptr), nextPiece(getRandomPiece()), score(0), speed(300)
+    bool gameOver;
+
+    Game() : grid(HEIGHT, std::vector<int>(WIDTH, 0)), score(0), speed(300), gameOver(false)
     {
         srand(static_cast<unsigned int>(time(0)));
         loadHighScore();
+        Tetromino tetromino;
+        currentPiece = tetromino.generateTetromino();
+        nextPiece = tetromino.generateTetromino();
+        pieceX = WIDTH / 2 - 2;
+        pieceY = 0;
         clearScreen();
-    }
-
-    // destructor
-    ~Game()
-    {
-        if (currentPiece)
-            delete currentPiece;
-        if (nextPiece)
-            delete nextPiece;
-    }
-
-    int getSpeed()
-    {
-        return speed;
     }
 
     void setColor(int color)
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-    }
-
-    int getPieceColor(const std::vector<std::vector<int>> &shape)
-    {
-        if (shape.size() == 1 || shape[0].size() == 4)
-            return 9;
-        if (shape.size() == 2 && shape[0].size() == 2)
-            return 14;
-        if (shape.size() == 2 && shape[0].size() == 3 && shape[1][0] == 1 && shape[1][2] == 1)
-            return 13;
-        if (shape.size() == 2 && shape[0][1] == 1 && shape[1][2] == 1)
-            return 4;
-        if (shape.size() == 2 && shape[1][0] == 1 && shape[0][1] == 1)
-            return 2;
-        if (shape.size() == 2 && shape[1][0] == 1)
-            return 3;
-        if (shape.size() == 2 && shape[0][2] == 1)
-            return 8;
-
-        return 7; // Default white
-    }
-
-    int calculateGhostY()
-    {
-        if (!currentPiece)
-            return 0;
-
-        int ghostY = currentPiece->y;
-        while (isValidMove(currentPiece, currentPiece->x, ghostY + 1))
-        {
-            ghostY++;
-        }
-        return ghostY;
     }
 
     void draw()
@@ -294,51 +267,36 @@ public:
 
         setColor(7); // White color for borders
 
-        // Top border - now matches grid width
+        // Top border
         std::cout << char(219);
         for (int j = 0; j < WIDTH * 2; j++)
             std::cout << char(219);
         std::cout << char(219) << "  Next Piece:";
 
-        // Clear the next piece area (4 rows should be enough for any piece)
-        for (int i = 1; i <= 4; i++)
+        // Draw next piece preview
+        for (int i = 0; i < 4; i++)
         {
             cursorPosition.X = WIDTH * 2 + 4;
-            cursorPosition.Y = i;
+            cursorPosition.Y = i + 1;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
-            std::cout << "        "; // Clear about 4 blocks width
-        }
 
-        // Draw next piece preview
-        if (nextPiece)
-        {
-            for (size_t pi = 0; pi < nextPiece->shape.size(); ++pi)
+            for (int j = 0; j < 4; j++)
             {
-                cursorPosition.X = WIDTH * 2 + 4;
-                cursorPosition.Y = pi + 1;
-                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
-
-                for (size_t pj = 0; pj < nextPiece->shape[0].size(); ++pj)
+                if (nextPiece.states[nextPiece.currState][i][j])
                 {
-                    if (nextPiece->shape[pi][pj])
-                    {
-                        setColor(nextPiece->color);
-                        std::cout << "[]";
-                        setColor(7);
-                    }
-                    else
-                    {
-                        std::cout << "  ";
-                    }
+                    setColor(stoi(Tetromino::getColor(nextPiece.name)));
+                    std::cout << "[]";
+                    setColor(7);
+                }
+                else
+                {
+                    std::cout << "  ";
                 }
             }
         }
-        std::cout << "\n";
-
-        // ... rest of the existing draw function ...
 
         // Calculate ghost position
-        int ghostY = calculateGhostY();
+        int ghostY = findGhostY();
 
         for (int i = 0; i < HEIGHT; ++i)
         {
@@ -352,68 +310,42 @@ public:
                 bool isPieceCell = false;
                 bool isGhostCell = false;
 
-                // First check for actual piece (so it draws on top)
-                if (currentPiece)
+                // Draw current piece
+                for (int pi = 0; pi < 4; pi++)
                 {
-                    for (size_t pi = 0; pi < currentPiece->shape.size(); ++pi)
+                    for (int pj = 0; pj < 4; pj++)
                     {
-                        for (size_t pj = 0; pj < currentPiece->shape[0].size(); ++pj)
+                        if (currentPiece.states[currentPiece.currState][pi][pj] &&
+                            j == pieceX + pj && i == pieceY + pi)
                         {
-                            int x = currentPiece->x + pj;
-                            int y = currentPiece->y + pi;
+                            setColor(stoi(Tetromino::getColor(currentPiece.name)));
+                            std::cout << "[]";
+                            setColor(7);
+                            isPieceCell = true;
+                        }
+                    }
+                }
 
-                            if (currentPiece->shape[pi][pj] && x == j && y == i)
+                // Draw ghost piece
+                if (!isPieceCell)
+                {
+                    for (int pi = 0; pi < 4; pi++)
+                    {
+                        for (int pj = 0; pj < 4; pj++)
+                        {
+                            if (currentPiece.states[currentPiece.currState][pi][pj] &&
+                                j == pieceX + pj && i == ghostY + pi)
                             {
-                                setColor(currentPiece->color);
-                                std::cout << "[]";
+                                setColor(8); // Grey
+                                std::cout << "::";
                                 setColor(7);
-                                isPieceCell = true;
+                                isGhostCell = true;
                             }
                         }
                     }
                 }
 
-                // Then draw ghost piece (only if not overlapping with actual piece)
-                if (!isPieceCell && currentPiece && i >= ghostY && i < ghostY + (int)currentPiece->shape.size())
-                {
-                    for (size_t pi = 0; pi < currentPiece->shape.size(); ++pi)
-                    {
-                        for (size_t pj = 0; pj < currentPiece->shape[0].size(); ++pj)
-                        {
-                            int x = currentPiece->x + pj;
-                            int y = ghostY + pi;
-
-                            if (currentPiece->shape[pi][pj] && x == j && y == i)
-                            {
-                                // Check if this cell is on the border of the piece
-                                bool isBorder = false;
-
-                                // Left edge
-                                if (pj == 0 || !currentPiece->shape[pi][pj - 1])
-                                    isBorder = true;
-                                // Right edge
-                                else if (pj == currentPiece->shape[0].size() - 1 || !currentPiece->shape[pi][pj + 1])
-                                    isBorder = true;
-                                // Top edge
-                                else if (pi == 0 || !currentPiece->shape[pi - 1][pj])
-                                    isBorder = true;
-                                // Bottom edge
-                                else if (pi == currentPiece->shape.size() - 1 || !currentPiece->shape[pi + 1][pj])
-                                    isBorder = true;
-
-                                if (isBorder)
-                                {
-                                    setColor(8);                         // Grey color for ghost
-                                    std::cout << char(219) << char(219); // Two block characters
-                                    setColor(7);
-                                    isGhostCell = true;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Draw grid cells (only if neither piece nor ghost is here)
+                // Draw grid cells
                 if (!isPieceCell && !isGhostCell)
                 {
                     if (grid[i][j])
@@ -432,7 +364,7 @@ public:
             std::cout << "\n";
         }
 
-        // Bottom border - matches grid width
+        // Bottom border
         cursorPosition.X = 0;
         cursorPosition.Y = HEIGHT + 1;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
@@ -450,114 +382,76 @@ public:
 
     void update()
     {
-        if (!currentPiece)
-        {
-            currentPiece = nextPiece;
-            nextPiece = getRandomPiece();
-        }
-
         // Handle automatic falling
-        if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
+        if (!collided(pieceX, pieceY + 1, currentPiece))
         {
-            currentPiece->y++;
+            pieceY++;
         }
         else
         {
             placePiece();
-            clearLines();
-            if (isGameOver())
+            if (gameOver)
             {
-                PlaySound(0, 0, 0);
                 showGameOver();
                 resetGame();
             }
         }
 
-        // Handle keyboard input
+        // Handle keyboard input - only process the most recent key
         if (_kbhit())
         {
-            char key = _getch();
-            if (key == 0 || key == -32) // Handle special keys (arrow keys)
+            // Clear all buffered keys and only keep the most recent one
+            char key = 0;
+            while (_kbhit())
             {
-                key = _getch(); // Get the actual key value
-                switch (key)
-                {
-                case 75: // Left arrow key
-                    if (isValidMove(currentPiece, currentPiece->x - 1, currentPiece->y))
-                        currentPiece->x--;
-                    break;
-
-                case 77: // Right arrow key
-                    if (isValidMove(currentPiece, currentPiece->x + 1, currentPiece->y))
-                        currentPiece->x++;
-                    break;
-
-                case 72: // Up arrow key (Rotate)
-                {
-                    Tetromino temp = *currentPiece;
-                    temp.rotate();
-
-                    // Try normal rotation first
-                    if (isValidMove(&temp, temp.x, temp.y, true))
-                    {
-                        currentPiece->rotate();
-                    }
-                    // Try wall kicks if normal rotation fails
-                    else
-                    {
-                        // Try shifting left
-                        if (isValidMove(&temp, temp.x - 1, temp.y, true))
-                        {
-                            currentPiece->rotate();
-                            currentPiece->x--;
-                        }
-                        // Try shifting right
-                        else if (isValidMove(&temp, temp.x + 1, temp.y, true))
-                        {
-                            currentPiece->rotate();
-                            currentPiece->x++;
-                        }
-                        // Try shifting up (for ceiling kicks)
-                        else if (isValidMove(&temp, temp.x, temp.y - 1, true))
-                        {
-                            currentPiece->rotate();
-                            currentPiece->y--;
-                        }
-                    }
-
-                    // Final wall boundary check (Step 3)
-                    if (currentPiece->x < 0)
-                    {
-                        currentPiece->x = 0;
-                    }
-                    if (currentPiece->x + currentPiece->shape[0].size() > WIDTH)
-                    {
-                        currentPiece->x = WIDTH - currentPiece->shape[0].size();
-                    }
-                    break;
-                }
-
-                case 80: // Down arrow key (Soft drop)
-                    if (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
-                        currentPiece->y++;
-                    break;
+                key = _getch();
+                if (key == 0 || key == -32)
+                {                   // Arrow key prefix
+                    key = _getch(); // Get the actual arrow key
                 }
             }
-            else
-            {
-                switch (key)
-                {
-                case 32: // Spacebar (Hard drop)
-                    while (isValidMove(currentPiece, currentPiece->x, currentPiece->y + 1))
-                        currentPiece->y++;
-                    placePiece();
-                    clearLines();
-                    break;
 
-                case 27: // ESC key (Pause)
-                    pauseGame();
-                    break;
+            // Process only the most recent key
+            switch (key)
+            {
+            case 75: // Left arrow key
+                if (!collided(pieceX - 1, pieceY, currentPiece))
+                    pieceX--;
+                break;
+
+            case 77: // Right arrow key
+                if (!collided(pieceX + 1, pieceY, currentPiece))
+                    pieceX++;
+                break;
+
+            case 72: // Up arrow key (Rotate)
+            {
+                Tetromino::Shape temp = currentPiece;
+                Tetromino::rotate(temp);
+                if (!collided(pieceX, pieceY, temp))
+                    currentPiece = temp;
+                break;
+            }
+
+            case 80: // Down arrow key (Soft drop)
+                if (!collided(pieceX, pieceY + 1, currentPiece))
+                    pieceY++;
+                break;
+
+            case 32: // Spacebar (Hard drop)
+                while (!collided(pieceX, pieceY + 1, currentPiece))
+                    pieceY++;
+                placePiece();
+                if (gameOver)
+                {
+                    showGameOver();
+                    resetGame();
                 }
+                break;
+
+            case 27: // ESC key (Pause)
+                pauseGame();
+                break;
             }
         }
 
@@ -598,20 +492,24 @@ public:
         grid.assign(HEIGHT, std::vector<int>(WIDTH, 0));
         score = 0;
         speed = 300;
+        gameOver = false;
+        Tetromino tetromino;
+        currentPiece = tetromino.generateTetromino();
+        nextPiece = tetromino.generateTetromino();
+        pieceX = WIDTH / 2 - 2;
+        pieceY = 0;
         clearScreen();
-
         PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC | SND_LOOP);
     }
 
     void showGameOver()
     {
-
         if (score > highScore)
         {
             highScore = score;
-            saveHighScore(); // Save the new high score
+            saveHighScore();
         }
-        system("cls"); // Clear screen when Game Over
+        system("cls");
         std::cout << "==========================" << std::endl;
         std::cout << "        GAME OVER!        " << std::endl;
         std::cout << "     Final Score: " << score << std::endl;
@@ -635,17 +533,6 @@ public:
             }
         }
     }
-
-    bool isGameOver()
-    {
-        for (int i = 0; i < WIDTH; ++i)
-        {
-            // Only consider game over if a BLOCK has SETTLED on row 0
-            if (grid[0][i] && currentPiece == nullptr)
-                return true;
-        }
-        return false;
-    }
 };
 
 int main()
@@ -667,14 +554,10 @@ void clearScreen()
     CONSOLE_SCREEN_BUFFER_INFO screen;
     DWORD written;
 
-    // Get the number of character cells in the current buffer
     GetConsoleScreenBufferInfo(console, &screen);
     DWORD cells = screen.dwSize.X * screen.dwSize.Y;
 
-    // Fill the entire screen with spaces
     FillConsoleOutputCharacter(console, ' ', cells, topLeft, &written);
-
-    // Reset the cursor to the top left
     SetConsoleCursorPosition(console, topLeft);
 }
 
@@ -702,7 +585,7 @@ void showWelcomeScreen()
     std::cout << "  PRESS ANY KEY TO START THE GAME\n";
     std::cout << "=====================================\n";
 
-    _getch(); // Wait for any key press
+    _getch();
     clearScreen();
     PlaySound(TEXT("sound.wav"), NULL, SND_ASYNC | SND_LOOP);
 }
