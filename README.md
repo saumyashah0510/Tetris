@@ -67,5 +67,12 @@ Speed increases with higher scores
 - The game includes sound effects during gameplay.
 - Ensure that sound.wav is in the same folder as the executable for proper functionality.
 
+## Sample Gameplay video:
+
+
+https://github.com/user-attachments/assets/b35cfe57-2516-494b-97cc-37689f77cd38
+
+
+
 ## License:
 This project is open-source and can be modified as needed.
