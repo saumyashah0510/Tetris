@@ -1,14 +1,6 @@
 # 🎮 Tetris (C++)
 Experience the nostalgia of Tetris in your terminal! This C++ implementation features colorful blocks, smooth controls, and a scoring system with high-score saving. Perfect for both casual gaming and coding inspiration!
 
-## 👥 Team: Silicon Syndicates
-| Member            | ID       |
-|-------------------|----------|
-| Saumya Shah       | 202401472|
-| Manav Shah        | 202404038|
-| Pranshu Vaghani   | 202404030|
-| Krishh Agrawal    | 202404017|
-
 ## 🚀 Features
 - Classic Tetris gameplay
 - Color-coded Tetromino pieces (I, O, T, S, Z, J, L)
